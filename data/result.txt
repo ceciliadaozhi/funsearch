@@ -1,0 +1,770 @@
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_costs[i] = machine_loads / (tasks[i] + 1)
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1380.0
+Sample time  : None
+Evaluate time: 5.034548759460449
+Sample orders: None
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    num_jobs, num_machines = tasks.shape
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros((num_jobs, num_machines))
+
+    for i in range(num_jobs):
+        if i not in current_seq:
+            job_bottleneck_machine = np.argmax(machine_loads)
+            machine_avg_processing_time = machine_loads[job_bottleneck_machine] / (np.count_nonzero(current_seq == job_bottleneck_machine) + 1)
+            job_processing_time = tasks[i, job_bottleneck_machine]
+            setup_costs[i, job_bottleneck_machine] = job_processing_time / machine_avg_processing_time
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1362.0
+Sample time  : 9.043120741844177
+Evaluate time: 6.103776454925537
+Sample orders: 66
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+    
+    num_machines = tasks.shape[1]
+
+    # Calculate machine loads and find bottleneck machine(s)
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    bottleneck_machines = np.where(machine_loads == np.max(machine_loads))[0]
+
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            # Calculate setup costs based on bottleneck machines and processing times
+            setup_costs[i] = (num_machines - np.sum(tasks[i, bottleneck_machines])) / (tasks[i] + 1)
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1321.0
+Sample time  : 6.3568137884140015
+Evaluate time: 6.7965123653411865
+Sample orders: 76
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    bottleneck_machines = np.where(machine_loads == np.max(machine_loads))[0]
+
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_costs[i] = machine_loads / (tasks[i] + 1)
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+
+    # Prioritize jobs with short processing times on bottleneck machines
+    for machine in bottleneck_machines:
+        adjusted_costs[np.where(tasks[:, machine] == np.min(tasks[:, machine]))] -= 0.5
+
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1333.0
+Sample time  : 5.842525362968445
+Evaluate time: 7.429502248764038
+Sample orders: 83
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+------------------------------------------------------
+Score        : 0.0
+Sample time  : 5.842525362968445
+Evaluate time: 0.5612237453460693
+Sample orders: 85
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            machine_loads_extended = machine_loads.copy()
+            machine_loads_extended[machine_loads == 0] = 1  # Avoid division by zero
+            setup_costs[i] = machine_loads_extended / (tasks[i] + 1)
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1323.0
+Sample time  : 4.810511887073517
+Evaluate time: 5.180447101593018
+Sample orders: 87
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+------------------------------------------------------
+Score        : 0.0
+Sample time  : 6.127124905586243
+Evaluate time: 0.8428032398223877
+Sample orders: 92
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing, setup costs,
+    and prioritizing jobs with short processing times on bottleneck machines.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    bottleneck_machine = np.argmax(machine_loads)
+
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_costs[i] = machine_loads / (tasks[i] + 1)
+
+    processing_times = tasks[:, bottleneck_machine]
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    adjusted_costs -= processing_times  # Subtract processing time on bottleneck machine
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1359.0
+Sample time  : 5.865396201610565
+Evaluate time: 6.197195768356323
+Sample orders: 95
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+
+    # Get the indices of the bottleneck machines
+    bottleneck_machines = np.where(machine_loads == np.max(machine_loads))[0]
+
+    # Get the processing times of the jobs on bottleneck machines
+    processing_times = np.sum(tasks[current_seq][:, bottleneck_machines], axis=1)
+
+    # Sort the jobs by the processing times on bottleneck machines in ascending order
+    sorted_jobs = np.argsort(processing_times)
+
+    # Find the first job that is not in the current sequence and return its index
+    for job in sorted_jobs:
+        if job not in current_seq:
+            return job
+    
+    return None
+------------------------------------------------------
+Score        : 0.0
+Sample time  : 5.865396201610565
+Evaluate time: 5.984943628311157
+Sample orders: 96
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    num_jobs, num_machines = tasks.shape
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros((num_jobs, num_machines))
+
+    for i in range(num_jobs):
+        if i not in current_seq:
+            job_bottleneck_machine = np.argmax(machine_loads)
+            candidate_machines = np.where(machine_loads == machine_loads[job_bottleneck_machine])[0]
+            if len(candidate_machines) > 1:
+                candidate_jobs = np.where(current_seq == job_bottleneck_machine)[0]
+                for candidate_job in candidate_jobs:
+                    setup_costs[i][candidate_machines] += tasks[candidate_job][candidate_machines]
+            machine_avg_processing_time = machine_loads[job_bottleneck_machine] / (np.count_nonzero(current_seq == job_bottleneck_machine) + 1)
+            job_processing_time = tasks[i, job_bottleneck_machine]
+            setup_costs[i, job_bottleneck_machine] += job_processing_time / machine_avg_processing_time
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1359.0
+Sample time  : 6.137897074222565
+Evaluate time: 6.2597644329071045
+Sample orders: 98
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing, setup costs,
+    and prioritizing jobs with short processing times on bottleneck machines.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    num_jobs, num_machines = tasks.shape
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros((num_jobs, num_machines))
+
+    for i in range(num_jobs):
+        if i not in current_seq:
+            job_bottleneck_machine = np.argmax(machine_loads)
+            machine_avg_processing_time = machine_loads[job_bottleneck_machine] / (np.count_nonzero(current_seq == job_bottleneck_machine) + 1)
+            job_processing_time = tasks[i, job_bottleneck_machine]
+            setup_costs[i, job_bottleneck_machine] = job_processing_time / machine_avg_processing_time
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    adjusted_costs *= tasks[:, np.argmax(machine_loads)]
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1303.0
+Sample time  : 6.137897074222565
+Evaluate time: 6.613837957382202
+Sample orders: 99
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing, setup costs,
+    and prioritizing jobs with short processing times on bottleneck machines. This version also tries to group similar jobs together.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    num_jobs, num_machines = tasks.shape
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros((num_jobs, num_machines))
+
+    for i in range(num_jobs):
+        if i not in current_seq:
+            job_bottleneck_machine = np.argmax(machine_loads)
+            machine_avg_processing_time = machine_loads[job_bottleneck_machine] / (np.count_nonzero(current_seq == job_bottleneck_machine) + 1)
+            job_processing_time = tasks[i, job_bottleneck_machine]
+            setup_costs[i, job_bottleneck_machine] = job_processing_time / machine_avg_processing_time
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    adjusted_costs *= tasks[:, np.argmax(machine_loads)]
+
+    # Group similar jobs together based on the similarity of their processing times
+    similarity_matrix = np.zeros((num_jobs, num_jobs))
+    for i in range(num_jobs):
+        for j in range(num_jobs):
+            similarity_matrix[i, j] = np.abs(np.mean(tasks[i]) - np.mean(tasks[j]))
+
+    job_similarity_scores = np.sum(similarity_matrix, axis=1)
+    adjusted_costs *= job_similarity_scores
+
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1297.0
+Sample time  : 6.039648175239563
+Evaluate time: 6.68319845199585
+Sample orders: 107
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+------------------------------------------------------
+Score        : 0.0
+Sample time  : 6.039648175239563
+Evaluate time: 0.5432193279266357
+Sample orders: 109
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    bottleneck_machine = np.argmax(machine_loads)
+
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_costs[i] = machine_loads[bottleneck_machine] / tasks[i][bottleneck_machine]
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1318.0
+Sample time  : 6.587851405143738
+Evaluate time: 5.034893274307251
+Sample orders: 110
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_costs[i] = machine_loads / (tasks[i] + 1)
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1297.0
+Sample time  : 6.587851405143738
+Evaluate time: 5.890880823135376
+Sample orders: 113
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    # Get the current machine loads
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    
+    # Calculate the setup costs for each task 
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_costs[i] = machine_loads / (tasks[i] + 1)
+    
+    # Calculate the adjusted costs for each task considering both processing times and setup costs
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    
+    # Set the adjusted costs of tasks that have already been sequenced to infinity
+    adjusted_costs[current_seq] = np.inf
+    
+    # Return the index of the task with the lowest adjusted cost
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1372.0
+Sample time  : 4.916279494762421
+Evaluate time: 4.273911237716675
+Sample orders: 114
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+------------------------------------------------------
+Score        : 0.0
+Sample time  : 4.916279494762421
+Evaluate time: 0.5649642944335938
+Sample orders: 116
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros(tasks.shape)
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            # Check if the current job is on a bottleneck machine
+            is_bottleneck_machine = machine_loads == max(machine_loads)
+            # Compute adjusted setup costs based on bottleneck machines and job processing times
+            setup_costs[i] = is_bottleneck_machine / (tasks[i] + 1)
+    
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1349.0
+Sample time  : 6.689853489398956
+Evaluate time: 5.788580894470215
+Sample orders: 119
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+    Prioritizes jobs with short processing times on bottleneck machines and tries to group similar jobs together to reduce setup times.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros(tasks.shape)
+
+    bottleneck_machine = np.argmax(machine_loads)
+    task_processing_times = np.sum(tasks, axis=1)
+    sorted_indices = np.argsort(task_processing_times)
+
+    for task_idx in sorted_indices:
+        if task_idx not in current_seq:
+            setup_costs[task_idx] = machine_loads / (tasks[task_idx] + 1)
+            setup_costs[task_idx][bottleneck_machine] -= 1  # Prioritize bottleneck machine
+
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1369.0
+Sample time  : 6.288809359073639
+Evaluate time: 8.854116678237915
+Sample orders: 130
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_times = np.zeros(tasks.shape)
+
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            setup_times[i] = machine_loads / (tasks[i] + 1)
+
+    bottleneck_machines = np.argmax(machine_loads)
+    priority_scores = tasks[:, bottleneck_machines] + setup_times[:, bottleneck_machines]
+
+    sorted_indices = np.argsort(priority_scores)
+    valid_indices = [i for i in sorted_indices if i not in current_seq]
+
+    if len(valid_indices) > 0:
+        return valid_indices[0]
+    else:
+        return None
+------------------------------------------------------
+Score        : -1302.0
+Sample time  : 6.288809359073639
+Evaluate time: 6.267362356185913
+Sample orders: 133
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+------------------------------------------------------
+Score        : 0.0
+Sample time  : 5.539365768432617
+Evaluate time: 0.549433708190918
+Sample orders: 138
+================= Evaluated Function =================
+def priority(current_seq: np.ndarray, tasks: np.ndarray) -> int | None:
+    """
+    Returns priority for which we want to select the next task indices, considering machine workload balancing and setup costs.
+
+    Args:
+        current_seq: An array of indices representing tasks that have already been sequenced.
+        tasks: The current sequence of tasks, where tasks[i][j] represents the processing time of job i on machine j.
+
+    Return:
+        An array of task indices sorted by ascending order of their total costs. If no valid tasks are available,
+        an empty array is returned.
+    """
+    if len(current_seq) == 0:
+        return np.argmin(np.sum(tasks, axis=1))
+    
+    machine_loads = np.sum(tasks[current_seq], axis=0)
+    setup_costs = np.zeros(tasks.shape)
+    
+    # Determine the index and value of the bottleneck machine
+    bottleneck_machine_index = np.argmax(machine_loads)
+    bottleneck_machine_load = machine_loads[bottleneck_machine_index]
+    
+    for i in range(tasks.shape[0]):
+        if i not in current_seq:
+            # Calculate the adjusted setup cost
+            setup_costs[i] = 1 / (tasks[i][bottleneck_machine_index] + 1)
+    
+    adjusted_costs = np.sum(tasks + setup_costs, axis=1)
+    adjusted_costs[current_seq] = np.inf
+    return np.argmin(adjusted_costs)
+------------------------------------------------------
+Score        : -1322.0
+Sample time  : 6.7381415367126465
+Evaluate time: 5.18317985534668
+Sample orders: 145
